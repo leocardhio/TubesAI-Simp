@@ -1,8 +1,9 @@
 import random
 from time import time
 
-from src.constant import ShapeConstant
+from src.constant import ShapeConstant, GameConstant
 from src.model import State
+from src.utility import is_out
 
 from typing import Tuple, List
 
@@ -77,3 +78,20 @@ class LocalSearch:
                 max_value_direction = [colorvalue, (row_ax, col_ax), ShapeConstant.BLANK]
         
         return max_value_direction
+
+    def findStreakValue(self, state: State, n_player: int, thinking_time: float):
+        self.thinking_time = time() + thinking_time
+        quota = state.players[n_player].quota
+        board = state.board
+        max_value_direction = [0, (0,0), ShapeConstant.BLANK]
+
+        for col in range(0, board.col):
+            for row in range(state.board.row - 1, -1, -1):
+                if state.board[row, col].shape == ShapeConstant.BLANK:
+                    temp_value_direction = self.positionMaxValue(state, n_player, row, col)
+                    if max_value_direction[0] < temp_value_direction[0]:
+                        max_value_direction = temp_value_direction
+                    if max_value_direction[0] == temp_value_direction[0] and max_value_direction[2] == ShapeConstant.BLANK and temp_value_direction[2] != ShapeConstant.BLANK:
+                        max_value_direction = temp_value_direction
+                    break
+        return max_value_direction[0]
