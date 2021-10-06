@@ -19,33 +19,33 @@ class Minimax:
 
         minimax = self.minimax(state, n_player, -10, 10, True, 3)
 
-        best_movement = (minimax[1], minimax[2]) #minimax algorithm
+        best_movement = (minimax[1], minimax[2])  # minimax algorithm
 
         return best_movement
 
     def minimax(self, state: State, n_player: int, alpha: int, beta: int, maxTurn: bool, depth: int):
         node_value = self.node_value(state, n_player)
         if node_value != None:
-            print(f"Terminal value: {node_value}")
+            # print(f"Terminal value: {node_value}")
             return [node_value, -1, ShapeConstant.BLANK]
-        
+
         if (depth == 0):
             node_value = self.depth_value(state, n_player)
             return [node_value, -1, ShapeConstant.BLANK]
 
-
         doubleBreak = False
         if maxTurn:
-            maxEval = -10 #-10 maksudnya sebagai -infinit
-            maxTurn = [-1, ShapeConstant.BLANK] #[col, shape]
+            maxEval = -10  # -10 maksudnya sebagai -infinit
+            maxTurn = [-1, ShapeConstant.BLANK]  # [col, shape]
             for col in range(state.board.col):
                 for shape in [ShapeConstant.CROSS, ShapeConstant.CIRCLE]:
                     new_state = deepcopy(state)
                     row = place(new_state, n_player, shape, col)
                     if (row == - 1):
                         break
-                    print(f"MaxTurn: {col}, {shape}")
-                    Eval = self.minimax(new_state, n_player, alpha, beta, False, depth - 1)[0]
+                    # print(f"MaxTurn: {col}, {shape}")
+                    Eval = self.minimax(new_state, n_player,
+                                        alpha, beta, False, depth - 1)[0]
                     if Eval > maxEval:
                         maxEval = Eval
                         maxTurn = [col, shape]
@@ -60,16 +60,17 @@ class Minimax:
             return [maxEval, maxTurn[0], maxTurn[1]]
 
         else:
-            minEval = 10 #10 maksudnya sebagai infinit
-            minTurn = [-1, ShapeConstant.BLANK] #[col, shape]
+            minEval = 10  # 10 maksudnya sebagai infinit
+            minTurn = [-1, ShapeConstant.BLANK]  # [col, shape]
             for col in range(state.board.col):
                 for shape in [ShapeConstant.CROSS, ShapeConstant.CIRCLE]:
                     new_state = deepcopy(state)
-                    row = place(new_state, (n_player+1)%2, shape, col)
+                    row = place(new_state, (n_player+1) % 2, shape, col)
                     if (row == - 1):
                         break
-                    print(f"MinTurn: {col}, {shape}")
-                    Eval = self.minimax(new_state, n_player, alpha, beta, True, depth - 1)[0]
+                    # print(f"MinTurn: {col}, {shape}")
+                    Eval = self.minimax(new_state, n_player,
+                                        alpha, beta, True, depth - 1)[0]
                     if Eval < minEval:
                         minEval = Eval
                         minTurn = [col, shape]
@@ -82,7 +83,6 @@ class Minimax:
                 if doubleBreak:
                     break
             return [minEval, minTurn[0], minTurn[1]]
-
 
     def node_value(self, state: State, n_player: int):
         winner = is_win(state.board)
@@ -115,8 +115,6 @@ class Minimax:
 
         return maxValue
 
-
-
     def find_row(self, state: State, n_player: int, shape: str, col: str) -> int:
         if state.players[n_player].quota[shape] == 0:
             return -1
@@ -131,10 +129,12 @@ class Minimax:
         """
         returns the maximum terminal value.
         """
-        streak_way = [(-1, 0), (1, 0), (0, -1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
+        streak_way = [(-1, 0), (1, 0), (0, -1), (-1, -1),
+                      (-1, 1), (1, -1), (1, 1)]
         shape = state.players[n_player].shape
         color = state.players[n_player].color
-        max_value_direction = [0, (0,0), ShapeConstant.BLANK] #[value, streak_way, shape]
+        # [value, streak_way, shape]
+        max_value_direction = [0, (0, 0), ShapeConstant.BLANK]
 
         for row_ax, col_ax in streak_way:
             row_ = row + row_ax
@@ -152,7 +152,7 @@ class Minimax:
                     shapevalue += 1
                 else:
                     shape_streak = False
-                
+
                 if color_streak and color == state.board[row_, col_].color:
                     colorvalue += 1
                 else:
@@ -160,10 +160,11 @@ class Minimax:
 
                 row_ = row_ + row_ax
                 col_ = col_ + col_ax
-            
+
             if shapevalue > max_value_direction[0]:
                 max_value_direction = [shapevalue, (row_ax, col_ax), shape]
             if colorvalue > max_value_direction[0]:
-                max_value_direction = [colorvalue, (row_ax, col_ax), ShapeConstant.BLANK]
-        
+                max_value_direction = [colorvalue,
+                                       (row_ax, col_ax), ShapeConstant.BLANK]
+
         return max_value_direction[0]
